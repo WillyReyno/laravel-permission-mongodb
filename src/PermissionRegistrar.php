@@ -49,11 +49,15 @@ class PermissionRegistrar
      */
     public function registerPermissions(): bool
     {
-        $this->getPermissions()->map(function (Permission $permission) {
-            $this->gate->define($permission->name, function (Authorizable $user) use ($permission) {
-                return $user->hasPermissionTo($permission) ?: null;
+        try {
+            $this->getPermissions()->map(function (Permission $permission) {
+                $this->gate->define($permission->name, function (Authorizable $user) use ($permission) {
+                    return $user->hasPermissionTo($permission) ?: null;
+                });
             });
-        });
+        } catch(\Exception $e) {
+            error_log(get_class($e) . ' - '. $e->getMessage());
+        }
 
         return true;
     }
